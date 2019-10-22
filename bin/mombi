@@ -1,0 +1,66 @@
+#! /usr/bin/env ruby
+
+require 'rubygems'
+require 'optparse'
+require 'net/http'
+require 'fileutils'
+require 'yaml'
+
+require 'mombi'
+require 'mombi/relay'
+require 'mombi/server'
+
+configfile = '~/.config/mombi/config.yaml'
+defaults = {
+  :port => 8080,
+}
+
+optparse = OptionParser.new { |opts|
+  opts.banner = "Usage : twitterpunch [options] [filename]
+
+    Twitterpunch is designed to work with PhotoBooth and OS X Folder Actions.
+    When this script is called with the name of an image file, it will post the
+    image to Twitter, along with a randomly chosen message and a hashtag.
+
+    If you call the script with the --stream argument instead, it will listen
+    for tweets to that hashtag and display them in a slideshow. If the tweet
+    came from another user, Twitterpunch will speak it aloud.
+
+"
+
+  opts.on("-c", "--config", "Specify the configuration file.") do |file|
+    configfile = file
+  end
+
+  opts.on("-d", "--debug", "Display extra debugging information.") do
+    config[:debug] = true
+  end
+
+  opts.on("-v", "--version", "Display version information.") do
+    puts "Mombi version v#{Mombi::VERSION}"
+    exit 0
+  end
+
+  opts.separator('')
+
+  opts.on("-h", "--help", "Displays this help") do
+    puts opts
+    exit
+  end
+}
+optparse.parse!
+
+
+path = File.expand_path(configfile)
+FileUtils.mkdir_p File.dirname(path)
+File.write(path, defaults.to_yaml) unless File.size?(path)
+
+config  = YAML.load_file(path)
+options = {
+  :port   => config[:port],
+  :bind   => '0.0.0.0',
+  :config => path,
+  :relay  => Mombi::Relay.new(path),
+}
+
+Mombi::Server.run! options
