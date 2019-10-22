@@ -1,0 +1,140 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Mombi Remote" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad-retina.png">
+    <title>Mombi Remote</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        background-color: black;
+        color: white;
+        background-image: url(pumpkinhead.jpg);
+        background-position: center top; /* Center the image */
+        background-repeat: no-repeat; /* Do not repeat the image */
+        background-size: contain; /* Resize the background image to cover the entire container */
+
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+      }
+      .settings, .controls {
+        flex: 1;
+        text-align: center;
+      }
+      h1 {
+        font-size: 2.25em;
+        text-align: center;
+      }
+      .settings {
+        text-align: right;
+        margin-right: 3em;
+      }
+      .settings input[type=text] {
+        width: 4em;
+      }
+
+
+      input[type=button] {
+        flex: 4;
+        margin: 5px;
+        padding: 0;
+        font-size: 104pt;
+        font-weight: bolder;
+        background-color: #5e5959;
+        border: 6px solid #ccc;
+        border-radius: 32px;
+        white-space:normal;
+        -webkit-appearance: none;
+      }
+      input.active {
+        color: white;
+        font-size: 64pt;
+        background-color: #5e2524;
+      }
+      body.focused #message {
+        flex: 2;
+      }
+      body.focused input[type=button] {
+        flex: 3;
+        margin-bottom: 325px;
+        font-size: 64pt;
+      }
+
+      @media screen and (max-width: 370px) and (orientation:portrait) {
+        input[type=button] {
+          font-size: 64pt;
+        }
+        input.active {
+          font-size: 52pt;
+        }
+        body.focused #message {
+          flex: 6;
+        }
+        body.focused input[type=button] {
+          flex: 4;
+          margin-bottom: 250px;
+          font-size: 20pt;
+          border-radius: 6px;
+          padding: 0;
+        }
+      }
+      @media screen and (max-width: 650px) and (orientation:landscape) {
+        input[type=button] {
+          font-size: 84pt;
+        }
+        input.active {
+          font-size: 56pt;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mombi Remote Config</h1>
+
+    <div class="container">
+      <form action="/save" method="POST">
+        <div class="settings">
+          <div class="row">Duration: <input inputmode="numeric" pattern="[0-9]*" type="text" name="duration" value="<%= @data[:duration] %>"/></div>
+          <div class="row">Interval: <input inputmode="numeric" pattern="[0-9]*" type="text" name="interval" value="<%= @data[:interval] %>"/></div>
+          <div class="row"><input type="submit" id="btn" class="item" value="Save Settings" /></div>
+        </div>
+        <div class="controls">
+          <div class="row"><input type="button" id="btn" class="item" value="Blast" onclick="location.href='/blast';" /></div>
+        </div>
+      </form>
+    </div>
+
+  </body>
+  <script>
+    // really truly disable the shit out of pinch-to-zoom
+    var lastTouchEnd = 0;
+    document.documentElement.addEventListener('touchend', function (event) {
+      var now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    document.documentElement.addEventListener('touchstart', function (event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }, false);
+  </script>
+</html>
