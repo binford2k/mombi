@@ -14,6 +14,7 @@ configfile = '~/.config/mombi/config.yaml'
 defaults = {
   :port => 8080,
 }
+config = {}
 
 optparse = OptionParser.new { |opts|
   opts.banner = "Usage : twitterpunch [options] [filename]
@@ -28,12 +29,16 @@ optparse = OptionParser.new { |opts|
 
 "
 
-  opts.on("-c", "--config", "Specify the configuration file.") do |file|
+  opts.on("-c FILE", "--config FILE", "Specify the configuration file.") do |file|
     configfile = file
   end
 
   opts.on("-d", "--debug", "Display extra debugging information.") do
     config[:debug] = true
+  end
+
+  opts.on("-p PORT", "--port PORT", "Port to run the server on.") do |arg|
+    config[:port] = arg
   end
 
   opts.on("-v", "--version", "Display version information.") do
@@ -55,12 +60,12 @@ path = File.expand_path(configfile)
 FileUtils.mkdir_p File.dirname(path)
 File.write(path, defaults.to_yaml) unless File.size?(path)
 
-config  = YAML.load_file(path)
+config  = YAML.load_file(path).merge(config)
 options = {
   :port   => config[:port],
   :bind   => '0.0.0.0',
   :config => path,
-  :relay  => Mombi::Relay.new(path),
+  :relay  => Mombi::Relay.new(path, config[:debug]),
 }
 
 Mombi::Server.run! options
