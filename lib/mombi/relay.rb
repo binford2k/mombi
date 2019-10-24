@@ -6,31 +6,28 @@ PIN_NUM = 15
 class Mombi::Relay
   def initialize(configfile, debug=false)
     @configfile = configfile
-    @config     = YAML.load_file(@configfile) rescue {}
     @debug      = debug
     setup_gpio
+    reload
 
-    Thread.new do
-      loop do
-        sleep @config[:interval]
-        turn_on(@config[:duration])
-      end
+    $thing = self
+
+    loop do
+      sleep @config[:interval]
+      turn_on(@config[:duration])
     end
 
   end
 
-  def save(params={})
-    params.each do |key, value|
-      key   = key.to_sym
-      value = value.to_i if [:interval, :duration].include? key
-
-      @config[key] = value
-    end
-    File.write(@configfile, @config.to_yaml)
+  def reload
+    debug("Reloading config.")
+    # cannot flock within a signal handler
+    @config = YAML.load_file(@configfile) rescue {}
   end
 
   def blast
     puts 'blasting'
+    turn_on(@config[:blast])
   end
 
   def setup_gpio
@@ -50,4 +47,11 @@ class Mombi::Relay
     puts message if @debug
   end
 
+  Signal.trap("SIGHUP") {
+    $thing.reload
+  }
+
+  Signal.trap("SIGALRM") {
+    $thing.blast
+  }
 end

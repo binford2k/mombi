@@ -2,17 +2,15 @@
 
 require 'rubygems'
 require 'optparse'
-require 'net/http'
-require 'fileutils'
 require 'yaml'
 
 require 'mombi'
-require 'mombi/relay'
 require 'mombi/server'
 
 configfile = '~/.config/mombi/config.yaml'
 defaults = {
-  :port => 8080,
+  :port  => 8080,
+  :blast => 5,
 }
 config = {}
 
@@ -60,12 +58,18 @@ path = File.expand_path(configfile)
 FileUtils.mkdir_p File.dirname(path)
 File.write(path, defaults.to_yaml) unless File.size?(path)
 
-config  = YAML.load_file(path).merge(config)
+config   = YAML.load_file(path).merge(config)
+relaypid = Process.fork do
+  require 'mombi/relay'
+  Mombi::Relay.new(path, config[:debug])
+end
+
 options = {
   :port   => config[:port],
   :bind   => '0.0.0.0',
   :config => path,
-  :relay  => Mombi::Relay.new(path, config[:debug]),
+  :relay  => relaypid,
 }
 
 Mombi::Server.run! options
+Process.wait
