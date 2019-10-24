@@ -46,6 +46,7 @@
       }
       .settings input[type=text] {
         width: 4em;
+        text-align: right;
       }
 
 
@@ -104,13 +105,26 @@
     </style>
   </head>
   <body>
-    <h1>Mombi Remote Config</h1>
+    <h1>Mombi Remote</h1>
 
     <div class="container">
       <form action="/save" method="POST">
         <div class="settings">
-          <div class="row">Duration: <input inputmode="numeric" pattern="[0-9]*" type="text" name="duration" value="<%= @data[:duration] %>"/></div>
-          <div class="row">Interval: <input inputmode="numeric" pattern="[0-9]*" type="text" name="interval" value="<%= @data[:interval] %>"/></div>
+          <div class="row">
+            Duration:
+            <input inputmode="numeric" pattern="[0-9]*" type="text" name="duration" value="<%= @data[:duration] %>" onfocus="this.value=''"/>
+            <small>(sec)</small>
+          </div>
+          <div class="row">
+            Interval:
+            <input inputmode="numeric" pattern="[0-9]*" type="text" name="interval" value="<%= @data[:interval] %>" onfocus="this.value=''"/>
+            <small>(sec)</small>
+          </div>
+          <div class="row">
+            Blast Length:
+            <input inputmode="numeric" pattern="[0-9]*" type="text" name="blast" value="<%= @data[:blast] %>" onfocus="this.value=''"/>
+            <small>(sec)</small>
+          </div>
           <div class="row"><input type="submit" id="btn" class="item" value="Save Settings" /></div>
         </div>
         <div class="controls">

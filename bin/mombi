@@ -6,13 +6,7 @@ require 'yaml'
 
 require 'mombi'
 require 'mombi/server'
-
-configfile = '~/.config/mombi/config.yaml'
-defaults = {
-  :port  => 8080,
-  :blast => 5,
-}
-config = {}
+require 'mombi/relay'
 
 optparse = OptionParser.new { |opts|
   opts.banner = "Usage : twitterpunch [options] [filename]
@@ -28,15 +22,15 @@ optparse = OptionParser.new { |opts|
 "
 
   opts.on("-c FILE", "--config FILE", "Specify the configuration file.") do |file|
-    configfile = file
+    Mombi::configpath = file
   end
 
   opts.on("-d", "--debug", "Display extra debugging information.") do
-    config[:debug] = true
+    Mombi::override(:debug, true)
   end
 
   opts.on("-p PORT", "--port PORT", "Port to run the server on.") do |arg|
-    config[:port] = arg
+    Mombi::override(:port, arg)
   end
 
   opts.on("-v", "--version", "Display version information.") do
@@ -52,24 +46,12 @@ optparse = OptionParser.new { |opts|
   end
 }
 optparse.parse!
-
-
-path = File.expand_path(configfile)
-FileUtils.mkdir_p File.dirname(path)
-File.write(path, defaults.to_yaml) unless File.size?(path)
-
-config   = YAML.load_file(path).merge(config)
-relaypid = Process.fork do
-  require 'mombi/relay'
-  Mombi::Relay.new(path, config[:debug])
-end
+Mombi::loadconfig
 
 options = {
-  :port   => config[:port],
+  :port   => Mombi::overrides[:port],
   :bind   => '0.0.0.0',
-  :config => path,
-  :relay  => relaypid,
+  :relay  => Mombi::Relay.new,
 }
 
 Mombi::Server.run! options
-Process.wait

@@ -1,7 +1,6 @@
 require 'sinatra/base'
 require 'webrick'
 require 'tilt/erb'
-require 'yaml'
 
 class Mombi::Server < Sinatra::Base
 
@@ -15,12 +14,12 @@ class Mombi::Server < Sinatra::Base
   end
 
   get '/' do
-    @data = YAML.load_file(settings.config) rescue {}
+    @data = Mombi::config
     erb :index
   end
 
   get '/blast' do
-    blast
+    settings.relay.blast
     redirect back
   end
 
@@ -35,33 +34,16 @@ class Mombi::Server < Sinatra::Base
 
   helpers do
     def save(params={})
-      File.open(settings.config, File::RDWR|File::CREAT, 0644) do |file|
-        file.flock(File::LOCK_EX)
-        data = YAML.load(file.read) rescue {}
-        file.rewind
+      params.each do |key, value|
+        key   = key.to_sym
+        value = value.to_i if [:interval, :duration, :blast].include? key
 
-        params.each do |key, value|
-          key   = key.to_sym
-          value = value.to_i if [:interval, :duration].include? key
-
-          data[key] = value
-        end
-
-        file.write(data.to_yaml)
-        file.flush
-        file.truncate(file.pos)
+        Mombi::set(key, value)
       end
 
-      reload
+      Mombi::save
     end
 
-    def reload
-      Process.kill("SIGHUP", settings.relay)
-    end
-
-    def blast
-      Process.kill("SIGALRM", settings.relay)
-    end
   end
 
 end
