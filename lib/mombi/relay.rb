@@ -1,12 +1,11 @@
-require 'yaml'
-require 'rpi_gpio'
+require 'mombi'
 
 PIN_NUM = 15
 
 class Mombi::Relay
   def initialize
-    @debug = Mombi::overrides[:debug]
-    @mutex = Mutex.new
+    @logger = Mombi::logger
+    @mutex  = Mutex.new
 
     setup_gpio
     reload
@@ -21,7 +20,7 @@ class Mombi::Relay
   end
 
   def reload
-    debug("Reloading config.")
+    @logger.debug("Reloading config.")
     Mombi::loadconfig
   end
 
@@ -30,18 +29,22 @@ class Mombi::Relay
   end
 
   def setup_gpio
+    return if Mombi::config[:noop]
+
+    require 'rpi_gpio'
     RPi::GPIO.set_numbering :board
     RPi::GPIO.setup PIN_NUM, :as => :output
   end
 
   def turn_on(duration=5)
     return if @mutex.locked?
+
     @mutex.synchronize do
-      debug("Starting fogger for #{duration} seconds.")
-      RPi::GPIO.set_high PIN_NUM
+      @logger.debug("Starting fogger for #{duration} seconds.")
+      RPi::GPIO.set_high PIN_NUM unless Mombi::config[:noop]
       sleep duration
-      RPi::GPIO.set_low PIN_NUM
-      debug("Stopping fogger.")
+      RPi::GPIO.set_low PIN_NUM unless Mombi::config[:noop]
+      @logger.debug("Stopping fogger.")
     end
   end
 

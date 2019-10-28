@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'yaml'
+require 'logger'
 
 class Mombi
   VERSION = '0.0.1'
@@ -13,6 +14,7 @@ class Mombi
   }
   @@config = {}
   @@overrides = {}
+  @@logger = $stdout.isatty ? Logger.new(STDOUT) : Logger.new('mombi.log', 'monthly')
 
   def self.configpath
     @@configfile
@@ -38,8 +40,13 @@ class Mombi
     @@config.merge(@@overrides)
   end
 
+  def self.logger
+    @@logger
+  end
+
   def self.loadconfig
     @@config = @@defaults.merge(YAML.load_file(@@configfile)).merge(@@config)
+    @@logger.level = self::overrides[:debug] ? Logger::DEBUG : Logger::WARN
   end
 
   def self.save

@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'optparse'
-require 'yaml'
 
 require 'mombi'
 require 'mombi/server'
@@ -52,6 +51,7 @@ options = {
   :port   => Mombi::overrides[:port],
   :bind   => '0.0.0.0',
   :relay  => Mombi::Relay.new,
+  :logger => Mombi::logger,
 }
 
 Mombi::Server.run! options
