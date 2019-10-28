@@ -13,6 +13,10 @@ class Mombi::Server < Sinatra::Base
     enable :sessions
   end
 
+  before {
+    env["rack.logger"] = settings.logger if settings.logger
+  }
+
   get '/' do
     @data = Mombi::config
     erb :index
