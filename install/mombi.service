@@ -1,0 +1,11 @@
+[Unit]
+Description=Mombi Service Daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/mombi
+Restart=on-failure
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
