@@ -38,6 +38,9 @@ class Mombi::Server < Sinatra::Base
 
   helpers do
     def save(params={})
+      # checkboxes have to be handled differently because html reasons
+      Mombi::set(:noop, (params.delete('noop') == 'on'))
+
       params.each do |key, value|
         key   = key.to_sym
         value = value.to_i if [:interval, :duration, :blast].include? key
@@ -51,3 +54,4 @@ class Mombi::Server < Sinatra::Base
   end
 
 end
+

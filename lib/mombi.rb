@@ -5,8 +5,8 @@ require 'logger'
 class Mombi
   VERSION = '0.0.1'
 
-  @@configfile = File.expand_path('~/.config/mombi/config.yaml')
-  @@defaults  = {
+  @@configfile = (Process.euid == 0) ? '/etc/mombi.conf' : File.expand_path('~/.config/mombi/config.yaml')
+  @@defaults = {
       :port     => 8080,
       :duration => 3,
       :interval => 90,
@@ -14,7 +14,7 @@ class Mombi
   }
   @@config = {}
   @@overrides = {}
-  @@logger = $stdout.isatty ? Logger.new(STDOUT) : Logger.new('mombi.log', 'monthly')
+  @@logger = $stdout.isatty ? Logger.new(STDOUT) : Logger.new('/var/log/mombi.log', 'monthly')
 
   def self.configpath
     @@configfile
