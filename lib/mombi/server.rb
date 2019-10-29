@@ -27,6 +27,10 @@ class Mombi::Server < Sinatra::Base
     redirect back
   end
 
+  get '/poweroff' do
+    system('/sbin/halt') if Process.euid == 0
+  end
+
   post '/save' do
     save(params)
     redirect back
