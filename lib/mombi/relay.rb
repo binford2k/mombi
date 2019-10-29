@@ -1,4 +1,9 @@
 require 'mombi'
+begin
+  require 'rpi_gpio'
+rescue LoadError
+  puts "Failed to load rpi_gpio: this is ok if testing in noop mode."
+end
 
 PIN_NUM = 15
 
@@ -31,7 +36,6 @@ class Mombi::Relay
   def setup_gpio
     return if Mombi::config[:noop]
 
-    require 'rpi_gpio'
     RPi::GPIO.set_numbering :board
     RPi::GPIO.setup PIN_NUM, :as => :output
   end
