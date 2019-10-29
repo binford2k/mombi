@@ -111,6 +111,10 @@
       <form action="/save" method="POST">
         <div class="settings">
           <div class="row">
+            Disable:
+            <input type="checkbox" name="noop" <%= @data[:noop] ? 'checked' : ''%>/>
+          </div>
+          <div class="row">
             Duration:
             <input inputmode="numeric" pattern="[0-9]*" type="text" name="duration" value="<%= @data[:duration] %>" onfocus="this.value=''"/>
             <small>(sec)</small>
