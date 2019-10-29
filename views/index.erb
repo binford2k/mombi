@@ -36,13 +36,22 @@
         flex: 1;
         text-align: center;
       }
+      .section {
+        display: flex;
+        flex-direction: row-reverse;
+      }
       h1 {
         font-size: 2.25em;
         text-align: center;
       }
       .settings {
+        flex-basis: 12em;
+        flex-grow: 0;
+        margin: 1em;
+        padding: 1em;
+        background-color: rgba(89, 89, 89, 0.5);
+        border-radius: 0.5em 1em;
         text-align: right;
-        margin-right: 3em;
       }
       .settings input[type=text] {
         width: 4em;
@@ -109,28 +118,31 @@
 
     <div class="container">
       <form action="/save" method="POST">
-        <div class="settings">
-          <div class="row">
-            Disable:
-            <input type="checkbox" name="noop" <%= @data[:noop] ? 'checked' : ''%>/>
+        <div class="section">
+          <div class="settings">
+            <div class="row">
+              Disable:
+              <input type="checkbox" name="noop" <%= @data[:noop] ? 'checked' : ''%>/>
+            </div>
+            <div class="row">
+              Duration:
+              <input inputmode="numeric" pattern="[0-9]*" type="text" name="duration" value="<%= @data[:duration] %>" onfocus="this.value=''"/>
+              <small>(sec)</small>
+            </div>
+            <div class="row">
+              Interval:
+              <input inputmode="numeric" pattern="[0-9]*" type="text" name="interval" value="<%= @data[:interval] %>" onfocus="this.value=''"/>
+              <small>(sec)</small>
+            </div>
+            <div class="row">
+              Blast Length:
+              <input inputmode="numeric" pattern="[0-9]*" type="text" name="blast" value="<%= @data[:blast] %>" onfocus="this.value=''"/>
+              <small>(sec)</small>
+            </div>
+            <div class="row"><input type="submit" id="btn" class="item" value="Save Settings" /></div>
           </div>
-          <div class="row">
-            Duration:
-            <input inputmode="numeric" pattern="[0-9]*" type="text" name="duration" value="<%= @data[:duration] %>" onfocus="this.value=''"/>
-            <small>(sec)</small>
-          </div>
-          <div class="row">
-            Interval:
-            <input inputmode="numeric" pattern="[0-9]*" type="text" name="interval" value="<%= @data[:interval] %>" onfocus="this.value=''"/>
-            <small>(sec)</small>
-          </div>
-          <div class="row">
-            Blast Length:
-            <input inputmode="numeric" pattern="[0-9]*" type="text" name="blast" value="<%= @data[:blast] %>" onfocus="this.value=''"/>
-            <small>(sec)</small>
-          </div>
-          <div class="row"><input type="submit" id="btn" class="item" value="Save Settings" /></div>
         </div>
+
         <div class="controls">
           <div class="row"><input type="button" id="btn" class="item" value="Blast" onclick="location.href='/blast';" /></div>
         </div>
